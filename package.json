@@ -1,5 +1,5 @@
 {
-  "name": "ErrorCodeConverter",
+  "name": "error-code-converter",
   "displayName": "Error Code Converter",
   "description": "This converts BE error codes to FE error codes",
   "version": "0.0.1",
@@ -14,10 +14,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "ErrorCodeConverter.helloWorld",
-        "title": "Hello World"
+        "command": "ErrorCodeConverter.convertBackendErrorCode",
+        "title": "Convert Error Codes"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "ErrorCodeConverter.convertBackendErrorCode",
+          "group": "1_modification",
+          "when": "editorHasSelection"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

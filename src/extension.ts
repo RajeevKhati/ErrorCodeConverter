@@ -1,25 +1,76 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  let disposable = vscode.commands.registerCommand(
+    "ErrorCodeConverter.convertBackendErrorCode",
+    () => {
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+        const lines = selectedText.split("\n");
+        const frontendErrorObj = lines
+          .map((line) => {
+            const match = line.match(/^\s*([^:]+):/);
+            return match ? match[1].trim() : "";
+          })
+          .filter((str) => str !== "")
+          .reduce((acc, key) => {
+            const oldStr = key;
+            const arrStr = oldStr.split("_");
+            let newStr;
+            if (oldStr.endsWith("NOT_ACTIVE")) {
+              newStr = arrStr
+                .slice(0, arrStr.length - 2)
+                .reduce((wholeStr, currStr, index) => {
+                  if (index === 0) {
+                    return (
+                      currStr[0].toUpperCase() + currStr.slice(1).toLowerCase()
+                    );
+                  }
+                  return wholeStr + " " + currStr.toLowerCase();
+                }, "");
+              newStr = newStr + " is inactive";
+            } else if (arrStr[0] === "INVALID") {
+              newStr = arrStr.slice(1).reduce((wholeStr, currStr, index) => {
+                if (index === 0) {
+                  return (
+                    currStr[0].toUpperCase() + currStr.slice(1).toLowerCase()
+                  );
+                }
+                return wholeStr + " " + currStr.toLowerCase();
+              }, "");
+              newStr = newStr + " is invalid";
+            } else {
+              newStr = arrStr.reduce((wholeStr, currStr, index) => {
+                if (index === 0) {
+                  return (
+                    currStr[0].toUpperCase() + currStr.slice(1).toLowerCase()
+                  );
+                }
+                return wholeStr + " " + currStr.toLowerCase();
+              }, "");
+            }
+            if (key.endsWith("ALREADY_EXISTS")) {
+              newStr = newStr + " in the system";
+            }
+            return { ...acc, [key]: newStr + "." };
+          }, {}); // Filter out empty strings
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "ErrorCodeConverter" is now active!');
+        // const capitalizedText = text.toUpperCase();
+        editor.edit((editBuilder) => {
+          editBuilder.replace(
+            selection,
+            Object.entries(frontendErrorObj)
+              .map(([key, value]) => `"${key}": "${value}"`)
+              .join(",\n")
+          );
+        });
+      }
+    }
+  );
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('ErrorCodeConverter.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Error Code Converter!');
-	});
-
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated
