@@ -2,10 +2,10 @@
   "name": "error-code-converter",
   "displayName": "Error Code Converter",
   "description": "This converts BE error codes to FE error codes",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "Rajeev",
   "engines": {
-    "vscode": "^1.81.0"
+    "vscode": "^1.69.1"
   },
   "categories": [
     "Other"
@@ -35,10 +35,11 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "build": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.81.0",
+    "@types/vscode": "^1.69.1",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.2.5",
