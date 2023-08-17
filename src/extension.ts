@@ -8,7 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (editor) {
         const selection = editor.selection;
         const selectedText = editor.document.getText(selection);
-        const lines = selectedText.split("\n");
+        const lines = selectedText.split(",");
         const frontendErrorObj = lines
           .map((line) => {
             const match = line.match(/^\s*([^:]+):/);
